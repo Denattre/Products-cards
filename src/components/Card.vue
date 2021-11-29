@@ -1,5 +1,5 @@
 <template>
-<div @mouseover="cardHover = true" @mouseout="cardHover = false" class="product-card">
+<li @mouseover="cardHover = true" @mouseout="cardHover = false" class="product-card">
   <div class="card-content">
     <img :src="product.image" :alt="product.name">
     <h2>{{product.name}}</h2>
@@ -7,7 +7,7 @@
     <p class="product-price">{{product.price}} руб.</p>
   </div>
     <button @click="deleteCard" v-show="cardHover" class="delete"></button>
-</div>
+</li>
   
 </template>
 <script>
@@ -24,8 +24,7 @@ export default {
   },
   methods: {
     deleteCard() {
-      this.$emit('deleteCard', this.product.id)
-      console.log(this.product.id)
+      this.$emit('deleteCard')
     }
   },
   

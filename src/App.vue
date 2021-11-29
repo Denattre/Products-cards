@@ -1,13 +1,15 @@
 <template>
   <div class="app">
-    <h1>Добавление товара</h1>
+    <header>
+      <h1>Добавление товара</h1>
+      <SortSelect @changeOrder = "sortProducts"></SortSelect>
+    </header>
     <div class="content">
       <ProductForm @addProduct="createCard"></ProductForm>
-      <ul class="cards-container">
-        <li v-for="product in productsArray" :key="product.id" class="card">
-          <Card :product="product" @deleteCard="deleteProduct"></Card>
-        </li>
-      </ul>
+      <div v-if="isLoaded">Загрузка списка товаров</div>
+      <transition-group v-else tag="ul" name="list" class="cards-container">
+        <Card v-for="(product, index) in productsArray" :key="product.id" class="card" :product="product" @deleteCard="deleteProduct(index)"></Card>
+      </transition-group>
     </div>
   </div>
 </template>
@@ -15,56 +17,74 @@
 <script>
 import ProductForm from "@/components/ProductForm.vue"
 import Card from "@/components/Card.vue"
+import SortSelect from '@/components/SortSelect.vue'
+
+
 export default {
   components: {
     ProductForm,
-    Card
+    Card,
+    SortSelect
   },
   data() {
     return {
-      product: {
-        // name:'Наименование товара',
-        // description: "Довольно-таки интересное описание товара в несколько строк. Довольно-таки интересное описание товара в несколько строк",
-        // image: './assets/images/product-image.jpg',
-        // price: "10 000 руб."
-      },
+      product: {},
       productsArray: [],
       id: 1,
+      isLoaded: false
     }
   },
-  // mounted() {
-  //   if (localStorage.productsArray) {
-  //     this.productsArray = localStorage.productsArray;
-  //   }
-  // },
+
+  mounted() {
+    if (localStorage.getItem("productsArray") !== null) {
+      this.isLoaded = true;
+      this.productsArray = JSON.parse(localStorage.getItem("productsArray"));
+      this.isLoaded = false;
+    } 
+  },
+
   watch: {
     productsArray: function(newProductsArray) {
-      localStorage.productsArray = newProductsArray;
-      // console.log(newProductsArray)
+      localStorage.setItem('productsArray', JSON.stringify(newProductsArray))
     },
   },
+
   methods: {
     createCard(product) {
-      product.price = product.price.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ')
+      product.price = product.price.replace(/[^0-9]/g, '').replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ')
       product.id = this.id
       this.id++
       this.productsArray.push(product)
+      localStorage.setItem('productsArray', JSON.stringify(this.productsArray))
     },
-    deleteProduct(idToDelete) {
-      console.log(this.productsArray)
-      this.productsArray.forEach(function(el, i) {
-        if (el.id == idToDelete) {
-          this.productsArray.splice(i, 1)
-        } 
-        
-      })
-      console.log("Удалено")
+    deleteProduct(index) {
+      this.productsArray.splice(index, 1)
+      localStorage.setItem('productsArray', JSON.stringify(this.productsArray))
+    },
+    sortProducts(sortType) {
+      if (sortType == "asc") {
+        this.productsArray.sort(function(a, b) {
+          return a.price.replace(/[^0-9]/g, '') - b.price.replace(/[^0-9]/g, '');
+        });
+      } else if (sortType == "desc") {
+        this.productsArray.sort(function(a, b) {
+          return b.price.replace(/[^0-9]/g, '') - a.price.replace(/[^0-9]/g, '');
+        });
+      } else {
+        this.productsArray.sort(function(a, b){
+            let nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
+            if (nameA < nameB) return -1
+            if (nameA > nameB) return 1
+            return 0 
+          })
+      }
+      localStorage.setItem('productsArray', JSON.stringify(this.productsArray))
     }
   },
 }
 </script>
 
-<style >
+<style lang="scss">
 
   @font-face {
     font-family: 'sourceSansPro';
@@ -101,6 +121,12 @@ export default {
     margin-right: 32px;
   }
 
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
   h1 {
     font-size: 28px;
     font-weight: 600;
@@ -117,14 +143,43 @@ export default {
   .cards-container {
     display: flex;
     flex-wrap: wrap;
+    padding: 0;
     gap: 16px;
-    width: calc(66% - 16px);
+    width: 75%;
   }
 
   .card {
-      width: calc(33% - 16px);
+      width: calc(33% - 9px);
       list-style: none;
     }
+  .list-move {
+    transition: transform 1s;
+  }
+  .list-enter-active, .list-leave-active {
+    transition: all 1s;
+  }
+  .list-enter-from, .list-leave-to {
+    opacity: 0;
+    transform: translateY(30px);
+  }
 
+  @media (max-width:865px) {
+
+    header {
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+    .content {
+      flex-direction: column;
+    }
+   
+    .cards-container {
+      width: 100%;
+    }
+    
+    .card {
+      width: calc(50% - 16px);
+    }
+  }
   
 </style>

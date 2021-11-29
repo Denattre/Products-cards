@@ -18,7 +18,7 @@
       
       <div class="input-container">
         <label for="product-price" class="required-label">Цена товара</label>
-        <input v-model="product.price" @focus="checkFocus" @blur="inputFocused = ''" autocomplete="off" class="form__input" type="text" name="price" id="product-price" placeholder="Введите цену">
+        <input v-model="product.price" @focus="checkFocus" @input="regExpres"  @blur="inputFocused = ''"  autocomplete="off" class="form__input" type="text" name="price" id="product-price" placeholder="Введите цену">
         <div v-show="inputFocused === 'price'" class="required-message" >Это обязательное поле</div>
       </div>
     
@@ -27,9 +27,6 @@
 </template>
 <script>
 export default {
-  components: {
-    
-  },
   data() {
     return {
       product: {
@@ -38,9 +35,10 @@ export default {
         image: '',
         price: '',
       },
-      inputFocused: ''         
+      inputFocused: '',        
     }
   },
+
   computed: {
     checkForm: function () {
       if (this.product.name && this.product.image && this.product.price) {
@@ -49,6 +47,7 @@ export default {
       return false;
     }
   },
+
   methods: {
     addProduct(){
         this.$emit('addProduct', this.product)
@@ -62,13 +61,12 @@ export default {
 
     checkFocus(e) {
       this.inputFocused = e.target.name
+    },
+    regExpres(e) {
+      e.target.value = e.target.value.replace(/[^0-9]/g, '');
+      e.target.value = e.target.value.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ');
+      console.log(e.target.value)
     }
-    
-    // isRequired(value) {
-    //   if (value && value.trim()) {
-    //     return true;
-    //   }
-    // }
   },
 }
 </script>
@@ -78,11 +76,14 @@ export default {
     border: none;
     border-radius: 4px;
   }
+  
   $decor-color:#FF8484;
+
   .product-form {
     display: flex;
     flex-direction: column;
     width: calc(25% - 8px);
+    min-width: 245px;
     max-height: 460px;
     padding: 24px;
     margin-right: 16px;
@@ -165,5 +166,15 @@ export default {
     }
   }
 
+  @media (max-width:865px) {
+    .product-form {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 16px;
+      width: 70%;
+
+    }
+    
+  }
   
 </style>
