@@ -1,6 +1,6 @@
 <template>
   <div class="select-block">
-      <select @change="changeOrder" class="sort-select">
+      <select @change="changeOrder" class="sort-select" :disabled="productsArray.length == 0">
         <option value="defauld" selected>По умолчанию</option>
         <option value="asc">По возрастанию</option>
         <option value="desc">По убыванию</option>
@@ -9,11 +9,17 @@
 </template>
 <script>
 export default {
-    methods: {
-      changeOrder(event) {
-        this.$emit('changeOrder', event.target.value)
-      }
-    },
+  props: {
+    productsArray: {
+      type: Object
+    }
+  },
+
+  methods: {
+    changeOrder(event) {
+      this.$emit('changeOrder', event.target.value)
+    }
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -38,6 +44,9 @@ export default {
     font-size: 12px;
     &:hover {
       @include user-accessibility();
+    }
+    &:disabled {
+      box-shadow: none;
     }
   }
   

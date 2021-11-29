@@ -2,7 +2,7 @@
   <div class="app">
     <header>
       <h1>Добавление товара</h1>
-      <SortSelect @changeOrder = "sortProducts"></SortSelect>
+      <SortSelect @changeOrder = "sortProducts" :productsArray="productsArray"></SortSelect>
     </header>
     <div class="content">
       <ProductForm @addProduct="createCard"></ProductForm>
@@ -119,6 +119,7 @@ export default {
   .app {
     margin-left: 32px;
     margin-right: 32px;
+    padding-bottom: 20px;
   }
 
   header {
