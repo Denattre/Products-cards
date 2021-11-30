@@ -62,9 +62,11 @@ export default {
     checkFocus(e) {
       this.inputFocused = e.target.name
     },
+    
     regExpres(e) {
-      e.target.value = e.target.value.replace(/[^0-9]/g, '');
-      e.target.value = e.target.value.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ');
+      e.target.value = e.target.value.replace(/[^0-9]/g, ''); //удаляет всё кроме цифр
+      e.target.value = e.target.value.replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ');//разделяет по разряду тысяч
+      e.target.value = e.target.value.replace(/[a-zа-яё]/gi, '');//разделяет по разряду тысяч
       console.log(e.target.value)
     }
   },
@@ -131,6 +133,7 @@ export default {
         position: absolute;
         width: 4px;
         height: 4px;
+        top: 1px;
         border-radius: 4px;
         background-color: $decor-color;  
     

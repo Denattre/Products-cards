@@ -6,7 +6,7 @@
     </header>
     <div class="content">
       <ProductForm @addProduct="createCard"></ProductForm>
-      <div v-if="isLoaded">Загрузка списка товаров</div>
+      <div v-if="isLoading">Загрузка списка товаров</div>
       <transition-group v-else tag="ul" name="list" class="cards-container">
         <Card v-for="(product, index) in productsArray" :key="product.id" class="card" :product="product" @deleteCard="deleteProduct(index)"></Card>
       </transition-group>
@@ -31,15 +31,15 @@ export default {
       product: {},
       productsArray: [],
       id: 1,
-      isLoaded: false
+      isLoading: false
     }
   },
 
   mounted() {
     if (localStorage.getItem("productsArray") !== null) {
-      this.isLoaded = true;
+      this.isLoading = true;
       this.productsArray = JSON.parse(localStorage.getItem("productsArray"));
-      this.isLoaded = false;
+      this.isLoading = false;
     } 
   },
 
